@@ -2,11 +2,18 @@ import os
 import lyricsgenius
 
 GENIUS_API_KEY = os.getenv("GENIUS_API_KEY")
+
+custom_headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0 Safari/537.36",
+    "Accept-Language": "en-US,en;q=0.9"
+}
+
 genius = lyricsgenius.Genius(
     GENIUS_API_KEY,
     timeout=15,
     retries=3,
-    remove_section_headers=True
+    remove_section_headers=True,
+    headers=custom_headers
 )
 
 def get_artist_songs(artist_name: str, max_songs: int | None = None):
