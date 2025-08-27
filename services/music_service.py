@@ -13,8 +13,9 @@ genius = lyricsgenius.Genius(
     timeout=15,
     retries=3,
     remove_section_headers=True,
-    headers=custom_headers
 )
+
+genius._session.headers.update(custom_headers)
 
 def get_artist_songs(artist_name: str, max_songs: int | None = None):
     artist = genius.search_artist(
