@@ -8,10 +8,11 @@ router = APIRouter()
 def list_artist_songs(
     artist: str = Query(...),
     page: int = Query(1, ge=1),
-    per_page: int = Query(10, ge=1, le=100)
+    per_page: int = Query(10, ge=1, le=50)
 ):
+    max_songs = page * per_page
     try:
-        songs = music_controller.get_artist_songs(artist)
+        songs = music_controller.get_artist_songs(artist, max_songs)
     except ValueError as error:
         raise HTTPException(status_code=404, detail=str(error))
 
@@ -27,12 +28,32 @@ def list_artist_songs(
         "songs": paginated
     }
 
-@router.get("/lyrics/translate")
-def translate_song(artist: str = Query(...), title: str = Query(...)):
+@router.get("/lyrics")
+def get_song_lyrics(
+    artist: str = Query(...),
+    title: str = Query(...)
+):
     try:
         lyrics = music_controller.get_lyrics(artist, title)
     except ValueError as error:
         raise HTTPException(status_code=404, detail=str(error))
+    
+    return {
+        "artist": artist,
+        "title": title,
+        "lyrics": lyrics
+    }
+
+@router.get("/lyrics/translate")
+def translate_song(
+    artist: str = Query(...),
+    title: str = Query(...)
+):
+    try:
+        lyrics = music_controller.get_lyrics(artist, title)
+    except ValueError as error:
+        raise HTTPException(status_code=404, detail=str(error))
+
     translation = translate_lyrics(lyrics, language="portuguese")
     return {
         "artist": artist,
@@ -41,11 +62,15 @@ def translate_song(artist: str = Query(...), title: str = Query(...)):
     }
 
 @router.get("/lyrics/explain")
-def explain_song(artist: str = Query(...), title: str = Query(...)):
+def explain_song(
+    artist: str = Query(...),
+    title: str = Query(...)
+):
     try:
         lyrics = music_controller.get_lyrics(artist, title)
     except ValueError as error:
         raise HTTPException(status_code=404, detail=str(error))
+
     explanation = explain_lyrics(lyrics, language="portuguese")
     return {
         "artist": artist,
